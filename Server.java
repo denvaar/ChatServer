@@ -47,8 +47,7 @@ public class Server {
             Socket s = this.ss.accept();
 
             String ipAddress = s.getInetAddress().toString();
-            ipAddress.replaceAll("/", "");
-
+            ipAddress.replaceAll("\\/", "");
             System.out.println("New connection from " + ipAddress);
 
             ClientConnection newClientConnection = new ClientConnection(this, s);
@@ -73,13 +72,9 @@ public class Server {
     }
 
     public void sendToAll(String message) {
-        System.out.println("Server::sendToAll()");
         synchronized(this.clients) {
-        System.out.println("Server::sendToAll() -- synchronized");
             for (ClientConnection client : this.clients) {
-                System.out.println("Server::sendToAll() -- synchronized -- for");
                 System.out.println(message);
-                
                 try {
                     DataOutputStream output = client.getClientOutputStream();
                     output.writeUTF(message); // This is where the message is written.
@@ -101,11 +96,10 @@ public class Server {
         
         try {
             port = Integer.parseInt(args[0]);
+            new Server(port);
         } catch (Exception e) {
             System.out.println("Usage:    Server <port number>");
         }
-
-        new Server(port);
 
     }
 
