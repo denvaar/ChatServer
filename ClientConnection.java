@@ -34,6 +34,7 @@ public class ClientConnection extends Thread {
         this.myIpAddress = socket.getInetAddress().toString().replaceAll("\\/", "");
         this.output = null;
         this.input = null;
+        this.myAlias = null;
 
         start();
     }
@@ -47,13 +48,19 @@ public class ClientConnection extends Thread {
     }
 
     public String getIpAddress() { return this.myIpAddress; }
+    public String getAlias() { return this.myAlias; }
 
     public void messageDispatch() throws IOException {
         this.input = new DataInputStream(this.mySocket.getInputStream());
 
         while (true) {
             String message = this.input.readUTF() + "|" + this.myIpAddress;
-            System.out.println("Recieved '" + message + "' from " + this.myIpAddress);
+            
+            if (this.myAlias == null) {
+                String[] _message = message.split("\\|");
+                System.out.println("Alias not set yet.");
+                this.myAlias = _message[1];
+            }
             this.myServer.sendToAll(message);
         }
     }
@@ -62,10 +69,10 @@ public class ClientConnection extends Thread {
         try {
             messageDispatch();
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
             this.myServer.removeConnection(this);
-        }
+        }/* finally {
+            this.myServer.removeConnection(this);
+        }*/
 
     }
 

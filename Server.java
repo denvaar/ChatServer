@@ -65,6 +65,7 @@ public class Server {
 
             try {
                 client.closeConnection();
+                sendToAll("SERVER_TEXT|||");
             } catch (IOException e) {
                 System.out.println("Error closing connection to " + client.getIpAddress());
             }
@@ -77,13 +78,22 @@ public class Server {
                 System.out.println(message);
                 try {
                     DataOutputStream output = client.getClientOutputStream();
-                    output.writeUTF(message); // This is where the message is written.
+                    output.writeUTF(message + "|" + getConnectedClients()); // This is where the message is written.
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
             }
         }
+    }
+
+    private String getConnectedClients() {
+        String usernames = "";
+        for (ClientConnection client : this.clients) {
+            usernames += client.getAlias() + ",";
+        }
+
+        return usernames;
     }
 
     public void sendToOne(String message) {
